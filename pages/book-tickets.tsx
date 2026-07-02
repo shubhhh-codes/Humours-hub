@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
 import clientPromise from '@/lib/mongodb';
 
 declare global {
@@ -415,10 +415,12 @@ export default function BookTickets({ tiersData, venueStatus }: { tiersData: any
 
   return (
     <div className="antialiased min-h-screen flex flex-col bg-[#0A0A0A] font-['DM_Sans',sans-serif] text-white">
-      <Head>
-        <title>The Humours Hub</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=overlays-content" />
-      </Head>
+      <SEO
+        title="Book Tickets | The Humours Hub"
+        description="Book your seat at the next Humours Hub comedy night in Ahmedabad. Tickets from ₹149."
+        noIndex={true}
+      />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=overlays-content" />
 
       <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
 

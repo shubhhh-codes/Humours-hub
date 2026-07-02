@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import Head from 'next/head';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
+import SEO from '@/components/SEO';
 import clientPromise from '@/lib/mongodb';
 
 export default function ShowsPage({ showsData }: { showsData: any }) {
@@ -37,17 +37,66 @@ export default function ShowsPage({ showsData }: { showsData: any }) {
     document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
   }, []);
 
+  // Build Event JSON-LD only if there is an upcoming show
+  const eventSchema = nextShow
+    ? {
+      '@context': 'https://schema.org',
+      '@type': 'Event',
+      name: nextShow.title || 'The Humours Hub — Live Comedy Night',
+      description:
+        'Live stand-up comedy, poetry, singing and guitar jams in Ahmedabad. Tickets from ₹149.',
+      image: nextShow.imageUrl || 'https://humourshub.shubhhh.in/og-image.jpg',
+      url: 'https://humourshub.shubhhh.in/shows',
+      eventStatus: 'https://schema.org/EventScheduled',
+      eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+      location: {
+        '@type': 'Place',
+        name: nextShow.metadata?.location || 'Ahmedabad Venue',
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: 'Ahmedabad',
+          addressRegion: 'Gujarat',
+          addressCountry: 'IN',
+        },
+      },
+      organizer: {
+        '@type': 'Organization',
+        name: 'The Humours Hub',
+        url: 'https://humourshub.shubhhh.in',
+      },
+      offers: {
+        '@type': 'Offer',
+        url: 'https://humourshub.shubhhh.in/book-tickets',
+        priceCurrency: 'INR',
+        price: nextShow.metadata?.ticketPrice?.toString().replace(/\D/g, '') || '149',
+        availability: 'https://schema.org/InStock',
+        validFrom: new Date().toISOString(),
+      },
+      performer: {
+        '@type': 'PerformingGroup',
+        name: 'The Humours Hub Performers',
+      },
+    }
+    : null;
+
   return (
     <>
-      <Head>
-        <title>The Humours Hub</title>
-        <meta name="description" content="Upcoming and past shows at The Humours Hub." />
-      </Head>
+      <SEO
+        title="Shows | The Humours Hub"
+        description="Upcoming and past comedy shows by The Humours Hub. Live stand-up, poetry, music nights in Ahmedabad."
+      />
+      {eventSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(eventSchema) }}
+        />
+      )}
 
       <Navbar />
 
       <div className="bg-[#131313] text-[#e5e2e1] font-body-md overflow-x-hidden min-h-screen pt-20">
-        <style dangerouslySetInnerHTML={{ __html: `
+        <style dangerouslySetInnerHTML={{
+          __html: `
           .headline-font { font-family: 'Hind', sans-serif; }
           .reveal-on-scroll {
               opacity: 0;
@@ -140,12 +189,12 @@ export default function ShowsPage({ showsData }: { showsData: any }) {
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-4">
-                     {nextShow.metadata?.bookMyShowUrl && nextShow.metadata.bookMyShowUrl.trim() !== "" && (
-                       <Link href={nextShow.metadata.bookMyShowUrl} target="_blank" className="bg-primary-container text-[#0A0A0A] px-8 py-4 rounded-full font-bold transition-all hover:bg-primary-container/90 flex items-center justify-center gap-2 btn-pulse">
-                         Book on BookMyShow
-                         <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 0" }}>arrow_forward</span>
-                       </Link>
-                     )}
+                    {nextShow.metadata?.bookMyShowUrl && nextShow.metadata.bookMyShowUrl.trim() !== "" && (
+                      <Link href={nextShow.metadata.bookMyShowUrl} target="_blank" className="bg-primary-container text-[#0A0A0A] px-8 py-4 rounded-full font-bold transition-all hover:bg-primary-container/90 flex items-center justify-center gap-2 btn-pulse">
+                        Book on BookMyShow
+                        <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 0" }}>arrow_forward</span>
+                      </Link>
+                    )}
                     <Link href="/book-tickets" className="border border-white/20 text-white px-8 py-4 rounded-full font-bold transition-all hover:bg-white/5 flex items-center justify-center gap-2">
                       Book on Our Website
                       <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 0" }}>arrow_forward</span>

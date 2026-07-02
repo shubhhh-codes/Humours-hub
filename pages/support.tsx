@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import Head from 'next/head';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
+import SEO from '@/components/SEO';
 
 export default function SupportPage() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
@@ -63,17 +63,41 @@ export default function SupportPage() {
     return parts.length > 0 ? parts : text;
   };
 
+  // Build FAQ JSON-LD from loaded faqs
+  const faqSchema =
+    faqs.length > 0
+      ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faqs.map((faq: any) => ({
+          '@type': 'Question',
+          name: faq.title,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: faq.content,
+          },
+        })),
+      }
+      : null;
+
   return (
     <>
-      <Head>
-        <title>The Humours Hub</title>
-        <meta name="description" content="Find answers to common questions about The Humours Hub shows, tickets, and venue." />
-      </Head>
+      <SEO
+        title="Support & FAQ | The Humours Hub"
+        description="Frequently asked questions about The Humours Hub tickets, shows, and venue in Ahmedabad. Get instant answers or chat with us on WhatsApp."
+      />
+      {faqSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      )}
 
       <Navbar />
 
       <div className="bg-[#0A0A0A] text-[#e5e2e1] font-body min-h-screen flex flex-col pt-20 overflow-x-hidden w-full">
-        <style dangerouslySetInnerHTML={{ __html: `
+        <style dangerouslySetInnerHTML={{
+          __html: `
           .surface-card {
               background-color: #141414;
           }
@@ -124,7 +148,7 @@ export default function SupportPage() {
 
           {/* Hero Section */}
           <section className="pt-24 pb-12 px-6 relative flex flex-col items-center text-center z-10">
-            
+
             <div className="max-w-3xl mx-auto relative z-10">
               <span className="font-headline font-bold text-xs tracking-[0.1em] text-[#ff6b1a] uppercase animate-fade-in-up">SUPPORT</span>
               <h1 className="font-headline font-bold text-4xl md:text-6xl lg:text-7xl text-[#e5e2e1] mt-4 mb-6 animate-fade-in-up delay-100 tracking-tight">How can we help?</h1>
@@ -139,15 +163,15 @@ export default function SupportPage() {
             <h2 className="font-headline font-bold text-xs tracking-[0.1em] text-[#ff6b1a] uppercase mb-8">COMMON QUESTIONS</h2>
             <div className="space-y-4" id="faq-container">
               {faqs.map((faq, index) => (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   className={`accordion-item surface-card border border-white/5 rounded overflow-hidden cursor-pointer transition-colors hover:border-white/10 group relative pl-1 ${activeFaq === index ? 'active' : ''}`}
                   onClick={() => toggleFaq(index)}
                 >
                   <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#ff6b1a] opacity-0 group-[.active]:opacity-100 transition-opacity"></div>
                   <div className="px-6 py-5 flex justify-between items-center accordion-header">
                     <h3 className="font-headline font-semibold text-lg text-[#e5e2e1] pr-4">{faq.title}</h3>
-                    <span className="material-symbols-outlined text-[rgba(229,226,225,0.45)] transition-transform duration-300 accordion-icon group-[.active]:text-[#ff6b1a]" style={{fontVariationSettings: "'FILL' 0"}}>expand_more</span>
+                    <span className="material-symbols-outlined text-[rgba(229,226,225,0.45)] transition-transform duration-300 accordion-icon group-[.active]:text-[#ff6b1a]" style={{ fontVariationSettings: "'FILL' 0" }}>expand_more</span>
                   </div>
                   <div className="accordion-content px-6">
                     <p className="font-body text-[rgba(229,226,225,0.45)] leading-relaxed">
@@ -167,7 +191,7 @@ export default function SupportPage() {
               <p className="font-body text-[rgba(229,226,225,0.7)] mb-8">Our team is available on WhatsApp.</p>
               <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-[#ff6b1a] font-headline font-bold text-lg hover:text-[#ff6b1a]/80 transition-colors group">
                 Chat on WhatsApp
-                <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform" style={{fontVariationSettings: "'FILL' 0"}}>arrow_forward</span>
+                <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform" style={{ fontVariationSettings: "'FILL' 0" }}>arrow_forward</span>
               </a>
             </div>
           </section>

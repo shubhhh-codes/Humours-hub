@@ -1,9 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
-import Head from 'next/head';
 import Image from 'next/image';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
 import { useState, useEffect } from 'react';
 import { GetStaticProps } from 'next';
 import { getDbSafe } from '@/lib/db-safe';
@@ -93,12 +93,75 @@ export default function Home({ performers, gallery, nextShow }: Props) {
     });
   }, []);
 
+  const organizationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'The Humours Hub',
+    url: 'https://humourshub.shubhhh.in',
+    logo: 'https://humourshub.shubhhh.in/favicon.svg',
+    sameAs: ['https://instagram.com/the.humourshub'],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer service',
+      availableLanguage: ['English', 'Hindi'],
+    },
+  };
+
+  const localBusinessSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'EntertainmentBusiness',
+    name: 'The Humours Hub',
+    description:
+      "Ahmedabad's live comedy and performance platform — stand-up comedy, poetry, singing and guitar jams. Tickets from ₹149.",
+    url: 'https://humourshub.shubhhh.in',
+    image: 'https://humourshub.shubhhh.in/og-image.jpg',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Ahmedabad',
+      addressRegion: 'Gujarat',
+      addressCountry: 'IN',
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: 23.0225,
+      longitude: 72.5714,
+    },
+    areaServed: 'Ahmedabad, Gujarat, India',
+    priceRange: '₹149 - ₹499',
+    currenciesAccepted: 'INR',
+    paymentAccepted: 'Cash, Credit Card, UPI',
+  };
+
+  const websiteSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'The Humours Hub',
+    url: 'https://humourshub.authorsbook.store',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: 'https://humourshub.authorsbook.store/shows?search={search_term_string}',
+      'query-input': 'required name=search_term_string',
+    },
+  };
+
   return (
     <>
-      <Head>
-        <title>The Humours Hub</title>
-        <meta name="description" content="Stand-up, poetry, singing, and guitar jams in Ahmedabad. Join us for an unforgettable night of entertainment!" />
-      </Head>
+      <SEO
+        title="Comedy Night in Ahmedabad | The Humours Hub"
+        description="Ahmedabad's live comedy platform. Stand-up, poetry, singing & guitar jams — all in one night. Tickets from ₹149."
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
       <Navbar />
 
       <main>
@@ -210,79 +273,79 @@ export default function Home({ performers, gallery, nextShow }: Props) {
             <div>
               <h2 className="font-headline-md text-headline-md text-primary-container font-bold mb-8">Next Show Details</h2>
               <div className="brutal-card p-0 flex flex-col lg:flex-row overflow-hidden border-white/20 shadow-2xl rounded-card">
-              <div className="lg:w-2/5 bg-brand-overlay relative min-h-[300px]">
-                <div
-                  className="absolute inset-0 bg-cover bg-center"
-                  style={{ backgroundImage: `url('${nextShow.imageUrl || 'https://images.unsplash.com/photo-1589189280918-cc442edfc628?q=80&w=2670&auto=format&fit=crop'}')` }}
-                ></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-surface to-transparent lg:bg-gradient-to-l opacity-80"></div>
-              </div>
-              <div className="lg:w-3/5 p-8 lg:p-12 flex flex-col justify-center">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="font-display-lg text-display-lg text-primary-container font-bold leading-none">{nextShow.metadata?.date || '24'}</div>
-                  <div className="flex flex-col">
-                    <span className="font-headline-sm text-headline-sm text-on-surface leading-none uppercase">{nextShow.metadata?.month || 'Nov'}</span>
-                    <span className="font-body-md text-body-md text-on-surface-variant">{nextShow.metadata?.day || 'Sunday'}</span>
-                  </div>
+                <div className="lg:w-2/5 bg-brand-overlay relative min-h-[300px]">
+                  <div
+                    className="absolute inset-0 bg-cover bg-center"
+                    style={{ backgroundImage: `url('${nextShow.imageUrl || 'https://images.unsplash.com/photo-1589189280918-cc442edfc628?q=80&w=2670&auto=format&fit=crop'}')` }}
+                  ></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-brand-surface to-transparent lg:bg-gradient-to-l opacity-80"></div>
                 </div>
-
-                <h3 className="font-headline-md text-headline-md text-on-surface mb-4">
-                  {nextShow.title || 'The Humours Hub: Open Mic Night'}
-                </h3>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 font-body-md text-body-md text-on-surface-variant">
-                  <div className="flex items-start gap-2">
-                    <span className="material-symbols-outlined text-primary-container shrink-0 mt-1">location_on</span>
-                    <span style={{ whiteSpace: 'pre-line' }}>{nextShow.metadata?.location || 'The Studio, SG Highway\nAhmedabad'}</span>
+                <div className="lg:w-3/5 p-8 lg:p-12 flex flex-col justify-center">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="font-display-lg text-display-lg text-primary-container font-bold leading-none">{nextShow.metadata?.date || '24'}</div>
+                    <div className="flex flex-col">
+                      <span className="font-headline-sm text-headline-sm text-on-surface leading-none uppercase">{nextShow.metadata?.month || 'Nov'}</span>
+                      <span className="font-body-md text-body-md text-on-surface-variant">{nextShow.metadata?.day || 'Sunday'}</span>
+                    </div>
                   </div>
-                  <div className="flex items-start gap-2">
-                    <span className="material-symbols-outlined text-primary-container shrink-0 mt-1">schedule</span>
-                    <span style={{ whiteSpace: 'pre-line' }}>{nextShow.metadata?.time || '8:00 PM to 10:30 PM\nGates open at 7:45 PM'}</span>
-                  </div>
-                </div>
 
-                <div className="flex flex-wrap items-center gap-6 mb-8 pt-6 border-t border-white/10">
-                  <div className="flex flex-col">
-                    <span className="font-label-caps text-label-caps text-on-surface-variant mb-1">Ticket Price</span>
-                    <span className="font-headline-sm text-headline-sm text-on-surface">₹{nextShow?.metadata?.ticketPrice?.toString().replace(/\D/g, '') || '149'}</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-label-caps text-label-caps text-on-surface-variant mb-1">Status</span>
-                    <span className="font-headline-sm text-headline-sm text-primary-container font-bold">
-                      {venueStatus.isFull ? 'Sold Out' : `${Math.max(0, 30 - venueStatus.totalApproved)} Seats Left`}
-                    </span>
-                  </div>
-                </div>
+                  <h3 className="font-headline-md text-headline-md text-on-surface mb-4">
+                    {nextShow.title || 'The Humours Hub: Open Mic Night'}
+                  </h3>
 
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Link href="/book-tickets" className="flex-1 bg-primary-container text-brand-black font-headline-sm text-headline-sm rounded-full px-6 py-4 text-center hover:bg-primary-container/90 transition-colors">
-                    Book on Our Website →
-                  </Link>
-                  {nextShow.metadata?.bookMyShowUrl && nextShow.metadata.bookMyShowUrl.trim() !== "" && (
-                    <a href={nextShow.metadata.bookMyShowUrl} target="_blank" rel="noopener noreferrer" className="flex-1 bg-transparent border border-white/20 text-on-surface font-headline-sm text-headline-sm rounded-full px-6 py-4 text-center hover:bg-white/5 transition-colors">
-                      Book on BookMyShow →
-                    </a>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 font-body-md text-body-md text-on-surface-variant">
+                    <div className="flex items-start gap-2">
+                      <span className="material-symbols-outlined text-primary-container shrink-0 mt-1">location_on</span>
+                      <span style={{ whiteSpace: 'pre-line' }}>{nextShow.metadata?.location || 'The Studio, SG Highway\nAhmedabad'}</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="material-symbols-outlined text-primary-container shrink-0 mt-1">schedule</span>
+                      <span style={{ whiteSpace: 'pre-line' }}>{nextShow.metadata?.time || '8:00 PM to 10:30 PM\nGates open at 7:45 PM'}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-6 mb-8 pt-6 border-t border-white/10">
+                    <div className="flex flex-col">
+                      <span className="font-label-caps text-label-caps text-on-surface-variant mb-1">Ticket Price</span>
+                      <span className="font-headline-sm text-headline-sm text-on-surface">₹{nextShow?.metadata?.ticketPrice?.toString().replace(/\D/g, '') || '149'}</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-label-caps text-label-caps text-on-surface-variant mb-1">Status</span>
+                      <span className="font-headline-sm text-headline-sm text-primary-container font-bold">
+                        {venueStatus.isFull ? 'Sold Out' : `${Math.max(0, 30 - venueStatus.totalApproved)} Seats Left`}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <Link href="/book-tickets" className="flex-1 bg-primary-container text-brand-black font-headline-sm text-headline-sm rounded-full px-6 py-4 text-center hover:bg-primary-container/90 transition-colors">
+                      Book on Our Website →
+                    </Link>
+                    {nextShow.metadata?.bookMyShowUrl && nextShow.metadata.bookMyShowUrl.trim() !== "" && (
+                      <a href={nextShow.metadata.bookMyShowUrl} target="_blank" rel="noopener noreferrer" className="flex-1 bg-transparent border border-white/20 text-on-surface font-headline-sm text-headline-sm rounded-full px-6 py-4 text-center hover:bg-white/5 transition-colors">
+                        Book on BookMyShow →
+                      </a>
+                    )}
+                  </div>
+
+                  {nextShow.metadata?.whatsappUrl && (
+                    <div className="mt-6 text-center">
+                      <a className="text-on-surface-variant hover:text-primary-container flex items-center justify-center gap-2 text-sm transition-colors" href={nextShow.metadata.whatsappUrl} target="_blank" rel="noopener noreferrer">
+                        <span className="material-symbols-outlined text-base">forum</span> Have questions? Ask on WhatsApp
+                      </a>
+                    </div>
                   )}
                 </div>
-
-                {nextShow.metadata?.whatsappUrl && (
-                  <div className="mt-6 text-center">
-                    <a className="text-on-surface-variant hover:text-primary-container flex items-center justify-center gap-2 text-sm transition-colors" href={nextShow.metadata.whatsappUrl} target="_blank" rel="noopener noreferrer">
-                      <span className="material-symbols-outlined text-base">forum</span> Have questions? Ask on WhatsApp
-                    </a>
-                  </div>
-                )}
               </div>
-            </div>
             </div>
           ) : (
             <div>
               <h2 className="font-headline-md text-headline-md text-primary-container font-bold mb-8">Next Show Details</h2>
               <div className="brutal-card p-12 text-center text-on-surface-variant border-white/20 shadow-2xl rounded-card">
-              <span className="material-symbols-outlined text-5xl mb-4 opacity-40">event_busy</span>
-              <p className="font-headline-sm">We're brewing up something special.</p>
-              <p className="font-body-md mt-2">No upcoming shows scheduled right now. Check back soon!</p>
-            </div>
+                <span className="material-symbols-outlined text-5xl mb-4 opacity-40">event_busy</span>
+                <p className="font-headline-sm">We're brewing up something special.</p>
+                <p className="font-body-md mt-2">No upcoming shows scheduled right now. Check back soon!</p>
+              </div>
             </div>
           )}
 
@@ -313,7 +376,7 @@ export default function Home({ performers, gallery, nextShow }: Props) {
                 <div key={performer._id} className="flex flex-col items-center gap-1 shrink-0 group">
                   <div className="w-32 h-32 rounded-full bg-brand-overlay border-2 border-transparent group-hover:border-primary-container transition-colors duration-300 overflow-hidden relative mb-2">
                     {performer.comedianProfile.photoId ? (
-                        <Image
+                      <Image
                         src={`/api/images/${performer.comedianProfile.photoId}`}
                         alt={performer.username}
                         className="w-full h-full object-cover"
@@ -367,24 +430,25 @@ export default function Home({ performers, gallery, nextShow }: Props) {
               {gallery.map((item, index) => {
                 const aspectClasses = ['aspect-square', 'aspect-video', 'aspect-[3/4]', 'aspect-video'];
                 const aspectClass = aspectClasses[index % aspectClasses.length];
-                
+
                 return (
-                <div key={item._id} className={`relative group rounded-card overflow-hidden bg-brand-overlay break-inside-avoid ${aspectClass}`}>
-                  <Image
-                    src={item.imageUrl}
-                    alt={item.title || 'Show Moment'}
-                    fill
-                    loading="lazy"
-                    className="object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
-                  />
-                  {item.title && (
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                      <p className="text-white text-sm font-headline-sm">{item.title}</p>
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-primary-container/0 group-hover:bg-primary-container/40 transition-colors duration-300"></div>
-                </div>
-              )})}
+                  <div key={item._id} className={`relative group rounded-card overflow-hidden bg-brand-overlay break-inside-avoid ${aspectClass}`}>
+                    <Image
+                      src={item.imageUrl}
+                      alt={item.title || 'Show Moment'}
+                      fill
+                      loading="lazy"
+                      className="object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
+                    />
+                    {item.title && (
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                        <p className="text-white text-sm font-headline-sm">{item.title}</p>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-primary-container/0 group-hover:bg-primary-container/40 transition-colors duration-300"></div>
+                  </div>
+                )
+              })}
             </div>
           )}
         </section>
@@ -405,7 +469,7 @@ export default function Home({ performers, gallery, nextShow }: Props) {
                 — REGULAR AUDIENCE MEMBER
               </cite>
             </div>
-            
+
             {/* Card 2: Feedback CTA */}
             <div className="bg-primary-container p-8 rounded-b-3xl text-center">
               <h3 className="text-2xl md:text-3xl font-bold text-brand-black mb-4 uppercase tracking-tight" style={{ fontFamily: "'Hind', sans-serif" }}>HELP US GET BETTER.</h3>

@@ -9,7 +9,7 @@ import { useState, useEffect, useRef } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import Head from 'next/head';
+import SEO from '@/components/SEO';
 import { startAuthentication } from '@simplewebauthn/browser';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -92,10 +92,10 @@ export default function Login() {
 
   return (
     <>
-      <Head>
-        <title>The Humours Hub</title>
-        <meta name="description" content="Sign in to The Humours Hub and continue your comedy journey." />
-      </Head>
+      <SEO
+        title="Admin Login | The Humours Hub"
+        noIndex={true}
+      />
 
       {/* Noise texture overlay */}
       <div

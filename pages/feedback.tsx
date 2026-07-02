@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Head from 'next/head';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
 
 export default function Feedback() {
   const [activeVibe, setActiveVibe] = useState<string | null>(null);
@@ -84,10 +84,10 @@ export default function Feedback() {
 
   return (
     <>
-      <Head>
-        <title>Feedback | The Humours Hub</title>
-        <meta name="description" content="Help us get better by providing your feedback." />
-      </Head>
+      <SEO
+        title="Feedback | The Humours Hub"
+        noIndex={true}
+      />
       <Navbar />
 
       <main className="relative pt-32 pb-24 min-h-screen flex flex-col items-center overflow-hidden bg-background">

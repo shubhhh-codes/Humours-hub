@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+Disallow: /auth/
+Disallow: /booking-success
+Disallow: /retrieve-tickets
+Disallow: /feedback
+
+Sitemap: https://humourshub.shubhhh.in/api/sitemap

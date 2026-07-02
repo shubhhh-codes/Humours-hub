@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import Head from 'next/head';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import Image from 'next/image';
+import SEO from '@/components/SEO';
 import clientPromise from '@/lib/mongodb';
 
 export default function GalleryPage({ galleryItems }: { galleryItems: any[] }) {
@@ -30,10 +30,10 @@ export default function GalleryPage({ galleryItems }: { galleryItems: any[] }) {
 
   return (
     <>
-      <Head>
-        <title>The Humours Hub</title>
-        <meta name="description" content="Gallery of real nights and real crowds at The Humours Hub." />
-      </Head>
+      <SEO
+        title="Gallery | The Humours Hub"
+        description="Real moments from real nights at The Humours Hub — crowd photos, stage shots, and after-show memories from Ahmedabad's comedy nights."
+      />
 
       <Navbar />
 
