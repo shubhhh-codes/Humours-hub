@@ -19,7 +19,6 @@ export default function RetrieveTickets() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [activeBookings, setActiveBookings] = useState<BookingItem[]>([]);
-  const [cancelledBookings, setCancelledBookings] = useState<BookingItem[]>([]);
   const [pendingBookings, setPendingBookings] = useState<BookingItem[]>([]);
   const [searched, setSearched] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -79,7 +78,6 @@ export default function RetrieveTickets() {
       if (!res.ok) throw new Error(data.message);
 
       setActiveBookings(data.activeBookings || []);
-      setCancelledBookings(data.cancelledBookings || []);
       setPendingBookings(data.pendingBookings || []);
       setSearched(true);
 
@@ -412,7 +410,7 @@ export default function RetrieveTickets() {
         {searched && (
           <div className="w-full max-w-4xl flex flex-col gap-8" id="results-section">
 
-            {(activeBookings.length === 0 && cancelledBookings.length === 0) && (
+            {activeBookings.length === 0 && (
               <>
                 <h2 className="font-headline-md text-[32px] font-bold text-white border-b border-white/10 pb-4 uppercase reveal-item delay-1">BOOKINGS</h2>
                 <div className="text-center py-12 text-on-surface-variant reveal-item delay-2">
@@ -491,31 +489,6 @@ export default function RetrieveTickets() {
               </>
             )}
 
-
-
-            {/* Cancelled Bookings */}
-            {cancelledBookings.length > 0 && (
-              <>
-                <h2 className="font-headline-md text-[32px] font-bold text-on-surface-variant border-b border-white/10 pb-4 mt-8 uppercase reveal-item delay-3">
-                  PAST &amp; CANCELLED
-                </h2>
-                {cancelledBookings.map(booking => (
-                  <div key={booking.bookingId} className="ticket-notch flex flex-col md:flex-row w-full border border-white/5 rounded-xl overflow-hidden opacity-50 grayscale reveal-item delay-3">
-                    <div className="p-6 md:p-8 flex-1">
-                      <div className="flex items-center gap-3 mb-4">
-                        <span className="bg-white/10 text-white font-label-caps tracking-widest text-[12px] font-bold px-3 py-1 rounded-full">CANCELLED</span>
-                        <span className="text-on-surface-variant font-label-caps tracking-widest text-xs">ID: {booking.bookingId}</span>
-                      </div>
-                      <h3 className="font-headline-sm text-[24px] font-bold text-white mb-2 uppercase">{booking.fullName}</h3>
-                      <p className="font-body-md text-[16px] text-on-surface-variant flex items-center gap-2">
-                        <span className="material-symbols-outlined text-[18px]">calendar_today</span>
-                        {new Date(booking.createdAt).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </>
-            )}
 
           </div>
         )}
