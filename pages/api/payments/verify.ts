@@ -88,7 +88,6 @@ async function handler(
     });
 
     if (existingPayment) {
-      console.log('Payment already processed:', razorpay_order_id);
       // Re-issue token so the user can still download even if they refresh the success page
       const downloadToken = issueDownloadToken(bookingId, booking.email);
       return res.status(200).json({ message: 'Payment already verified', bookingId, downloadToken });
@@ -119,8 +118,6 @@ async function handler(
       { $setOnInsert: payment },
       { upsert: true }
     );
-    console.log('Payment record processed:', payment.paymentId);
-
     // Update booking status to approved
     await db.collection('bookings').updateOne(
       { bookingId },
@@ -133,8 +130,6 @@ async function handler(
         }
       }
     );
-    console.log('Booking updated:', bookingId);
-
     // Calculate Time-to-Convert
     const timeToConvertMs = Date.now() - new Date(booking.createdAt).getTime();
     const timeToConvertSeconds = Math.floor(timeToConvertMs / 1000);

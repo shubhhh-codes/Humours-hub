@@ -27,7 +27,6 @@ async function handler(
         .sort({ createdAt: -1 })
         .toArray();
 
-      console.log('Fetched payments:', payments.length);
 
       // Calculate statistics
       const stats = {
@@ -39,7 +38,6 @@ async function handler(
         failedPayments: payments.filter((p: Document) => p.status !== 'completed').length,
       };
 
-      console.log('Payment stats:', stats);
 
       return res.status(200).json({
         payments,

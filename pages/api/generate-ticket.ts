@@ -20,7 +20,6 @@ async function getBrowser(): Promise<Browser> {
 
   // Evict stale browser
   if (_browser && now - _browserUsedAt > BROWSER_TTL_MS) {
-    console.log('[generate-ticket] Evicting stale browser (idle > 45s)');
     try { await _browser.close(); } catch {}
     _browser = null;
   }
@@ -45,7 +44,6 @@ async function getBrowser(): Promise<Browser> {
         headless: 'shell' as any, // @sparticuz/chromium ships chrome-headless-shell, not chrome
       });
     }
-    console.log('[generate-ticket] Browser launched');
   }
 
   _browserUsedAt = Date.now();
@@ -108,7 +106,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   // ── 4. Serve from cache if available ──────────────────────────────────────
   const cached = _pdfCache.get(bookingId);
   if (cached && Date.now() - cached.at < PDF_CACHE_TTL) {
-    console.log(`[generate-ticket] Cache HIT for ${bookingId}`);
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=HH-TICKET-${bookingId}.pdf`);
     res.setHeader('Content-Length', cached.buf.length);

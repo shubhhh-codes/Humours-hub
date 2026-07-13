@@ -64,9 +64,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         totalAttempts: previousAttempts
       });
       
-      console.log(`[PAYMENT_CANCELLED] Alert sent for booking: ${bookingId}. Repeat: ${isRepeat}`);
     } else {
-      console.log(`[PAYMENT_CANCELLED] Booking not found for: ${bookingId}`);
+      // Booking not found — nothing to cancel
     }
 
     return res.status(200).json({ success: true });

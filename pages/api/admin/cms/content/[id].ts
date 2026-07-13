@@ -11,7 +11,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const session = await getServerSession(req, res, authOptions);
     if (session?.user?.role !== 'admin') {
-      console.log('Failed auth check in [id].ts. Email:', session?.user?.email, 'Role:', session?.user?.role);
       return res.status(403).json({ message: 'Not authorized' });
     }
 
@@ -25,7 +24,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     
     let user = await db.collection('users').findOne({ email: session.user.email });
     if (!user) {
-      console.log('User not found in DB, auto-creating admin user document:', session.user.email);
       try {
         const result = await db.collection('users').insertOne({
           username: 'Admin',

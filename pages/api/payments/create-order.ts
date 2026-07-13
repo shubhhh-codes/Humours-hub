@@ -138,19 +138,7 @@ async function handler(
       receipt: bookingId || `receipt_${Date.now()}`,
     };
 
-    console.log('Creating Razorpay order with options:', {
-      ...options,
-      key_id: `${process.env.RAZORPAY_KEY_ID?.substring(0, 8)}...`,
-      environment: process.env.NODE_ENV
-    });
-
     const order = await razorpay.orders.create(options);
-
-    console.log('Order created successfully:', {
-      orderId: order.id,
-      amount: order.amount,
-      currency: order.currency
-    });
 
     return res.status(200).json({
       keyId: process.env.RAZORPAY_KEY_ID,
