@@ -11,6 +11,7 @@ import DownloadPaymentsButton from '@/components/UserDownloadPDF';
 import Image from 'next/image';
 import QRScanner from '@/components/admin/QRScanner';
 import PricingDashboard from '@/components/admin/analytics/PricingDashboard';
+import SEO from '@/components/SEO';
 interface Booking {
   _id: string;
   bookingId: string;
@@ -526,6 +527,7 @@ export default function AdminPanel() {
 
   return (
     <div className="bg-[#0e0e0e] text-[#e5e2e1] font-body-md antialiased flex h-screen w-full">
+      <SEO title="Admin Dashboard | The Humours Hub" noIndex={true} />
       
       {/* Mobile Top App Bar */}
       <header className="md:hidden flex justify-between items-center w-full px-5 h-20 bg-[#131313] border-b border-white/5 fixed top-0 left-0 z-50">

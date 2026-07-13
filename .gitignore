@@ -152,3 +152,4 @@ results.json
 !README.md
 !docs/**/*.md
 !docs/*.md
+.env*
