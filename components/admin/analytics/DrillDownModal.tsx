@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { BookingData } from './AnalyticsEngine';
 import { formatCurrency } from '../../../utils/format';
 
 export function DrillDownModal({ isOpen, onClose, title, data }: { isOpen: boolean, onClose: () => void, title: string, data: BookingData[] }) {
-  if (!isOpen) return null;
+  const [mounted, setMounted] = useState(false);
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!isOpen || !mounted) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
       <div className="bg-[#1c1b1b] rounded-xl border border-white/10 w-full max-w-4xl max-h-[85vh] flex flex-col shadow-2xl animate-enter">
         <div className="flex justify-between items-center p-6 border-b border-white/5">
           <div>
@@ -53,6 +60,7 @@ export function DrillDownModal({ isOpen, onClose, title, data }: { isOpen: boole
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

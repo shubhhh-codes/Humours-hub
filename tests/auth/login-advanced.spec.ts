@@ -1,5 +1,5 @@
 /**
- * AUTH - Advanced login tests: rate limiting, passkey, edge cases
+ * AUTH - Advanced login tests: rate limiting, edge cases
  */
 import { test, expect } from '../utils/auditFixture';
 
@@ -45,24 +45,6 @@ test.describe('Auth — Advanced Login Tests @security', () => {
     await page.waitForTimeout(3000);
     // Should still be on login page (not admin)
     expect(page.url()).toContain('/auth/login');
-  });
-
-  test('AUTH-ADV-005: Passkey button is visible', async ({ page }) => {
-    const passkeyBtn = page.locator('button:has-text("Passkey"), button:has-text("fingerprint")');
-    await expect(passkeyBtn.first()).toBeVisible();
-  });
-
-  test('AUTH-ADV-006: Passkey button click shows error gracefully when unavailable', async ({ page }) => {
-    await page.route('**/api/auth/webauthn/auth-options', route => route.fulfill({
-      status: 500, json: { error: 'No passkeys registered' }
-    }));
-    const passkeyBtn = page.locator('button:has-text("Passkey"), button:has-text("Sign in with Passkey")').first();
-    if (await passkeyBtn.isVisible()) {
-      await passkeyBtn.click();
-      await page.waitForTimeout(2000);
-      // Should show error, not blank screen
-      await expect(page.locator('body')).toBeVisible();
-    }
   });
 
   test('AUTH-ADV-007: Loading state shown during sign-in', async ({ page }) => {

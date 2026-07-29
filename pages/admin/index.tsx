@@ -2,7 +2,6 @@ import React from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
-import { startRegistration } from '@simplewebauthn/browser';
 import SiteCMS from '@/components/admin/SiteCMS';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -264,30 +263,6 @@ export default function AdminPanel() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [activeTab]);
 
-  const handleRegisterPasskey = async () => {
-    try {
-      const resp = await fetch('/api/auth/webauthn/register-options', { method: 'POST' });
-      if (!resp.ok) throw new Error('Failed to fetch registration options');
-      const { options, challengeId } = await resp.json();
-      
-      const authResponse = await startRegistration(options);
-      
-      const verifyResp = await fetch('/api/auth/webauthn/register-verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ response: authResponse, challengeId }),
-      });
-
-      if (verifyResp.ok) {
-        toast.success('Passkey registered successfully! You can now use it to log in.');
-      } else {
-        throw new Error('Verification failed');
-      }
-    } catch (err: any) {
-      console.error(err);
-      toast.error('Passkey registration failed');
-    }
-  };
 
   const handleTriggerCron = async () => {
     try {
@@ -539,13 +514,6 @@ export default function AdminPanel() {
         </div>
         <div className="flex items-center gap-4">
           <button 
-            onClick={handleRegisterPasskey}
-            className="w-10 h-10 rounded-full bg-[#353534] hover:bg-primary-container/20 text-on-surface hover:text-primary-container flex items-center justify-center transition-colors border border-white/5"
-            aria-label="Register Passkey"
-          >
-            <span className="material-symbols-outlined text-lg">fingerprint</span>
-          </button>
-          <button 
             onClick={() => signOut({ callbackUrl: '/' })}
             className="w-10 h-10 rounded-full brutalist-border overflow-hidden bg-[#353534] shrink-0 flex items-center justify-center font-bold text-error hover:bg-error/20 transition-colors"
             aria-label="Logout"
@@ -590,13 +558,6 @@ export default function AdminPanel() {
         
         {/* Footer */}
         <div className="mt-auto px-4">
-          <button 
-            onClick={handleRegisterPasskey}
-            className="w-full flex items-center gap-3 px-4 py-3 text-primary-container hover:bg-white/5 rounded-lg transition-all duration-200"
-          >
-            <span className="material-symbols-outlined">fingerprint</span>
-            <span className="font-body-md text-sm font-medium">Register Passkey</span>
-          </button>
           <button 
             onClick={() => signOut({ callbackUrl: '/' })} 
             className="w-full flex items-center gap-3 px-4 py-3 text-error hover:bg-white/5 rounded-lg transition-all duration-200"

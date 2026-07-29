@@ -1,16 +1,8 @@
-import React from 'react';
-/**
- * @copyright (c) 2024 - Present
- * @author github.com/shubhhh-codes
- * @license MIT
- */
-
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import SEO from '@/components/SEO';
-import { startAuthentication } from '@simplewebauthn/browser';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -62,34 +54,6 @@ export default function Login() {
     }
   };
 
-  const handlePasskeyLogin = async () => {
-    setIsLoading(true);
-    setError('');
-    try {
-      const resp = await fetch('/api/auth/webauthn/auth-options');
-      const { options, challengeId } = await resp.json();
-      
-      const authResponse = await startAuthentication({ optionsJSON: options });
-      
-      const result = await signIn('webauthn', {
-        redirect: false,
-        authResponse: JSON.stringify(authResponse),
-        challengeId,
-      });
-
-      if (result?.error) {
-        setError('Passkey login failed.');
-      } else {
-        window.location.href = '/admin';
-      }
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'Passkey authentication failed');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <>
       <SEO
@@ -97,13 +61,11 @@ export default function Login() {
         noIndex={true}
       />
 
-      {/* Noise texture overlay */}
       <div
         className="fixed inset-0 z-0 pointer-events-none opacity-[0.04]"
         style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/carbon-fibre.png')" }}
       />
 
-      {/* Spotlight radial glow */}
       <div
         className="fixed inset-0 z-0 pointer-events-none"
         style={{
@@ -119,111 +81,69 @@ export default function Login() {
           className="w-full max-w-md bg-[#141414] border border-white/5 p-8 md:p-10 shadow-2xl relative overflow-hidden group transition-transform duration-75"
           style={{ willChange: 'transform' }}
         >
-          {/* Decorative orange glow blob */}
-          <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary-container/10 rounded-full blur-3xl group-hover:bg-primary-container/20 transition-all duration-500 pointer-events-none" />
-
           {/* Header */}
-          <div className="text-center mb-10">
-            <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-container-high border border-white/5">
-              <span
-                className="material-symbols-outlined text-primary-container text-4xl"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                theater_comedy
-              </span>
-            </div>
-            <h1 className="font-headline-md text-headline-md text-on-surface mb-2">
-              Welcome Back! ✨
+          <div className="text-center mb-8">
+            <h1 className="font-headline-md text-headline-md font-bold text-on-surface mb-2">
+              Admin Portal
             </h1>
-            <p className="font-body-md text-body-md text-on-surface-variant opacity-70">
-              Sign in to continue your comedy journey
+            <p className="font-body-sm text-body-sm text-on-surface-variant">
+              Sign in to manage shows, tickets, and bookings
             </p>
           </div>
 
-          {/* Success banner */}
-          {router.query.registered && (
-            <div className="mb-6 flex items-center gap-3 bg-green-500/10 border border-green-500/20 px-4 py-3">
-              <span className="material-symbols-outlined text-green-400 text-lg">check_circle</span>
-              <p className="text-green-400 font-body-md text-sm">Registration successful! Please sign in.</p>
-            </div>
-          )}
-
-          {/* Error banner */}
           {error && (
-            <div className="mb-6 flex items-center gap-3 bg-red-500/10 border border-red-500/20 px-4 py-3">
-              <span className="material-symbols-outlined text-red-400 text-lg">error</span>
-              <p className="text-red-400 font-body-md text-sm">{error}</p>
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 font-body-sm text-body-sm rounded flex items-center gap-2">
+              <span className="material-symbols-outlined text-lg">error</span>
+              {error}
             </div>
           )}
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email */}
-            <div className="space-y-2">
-              <label htmlFor="email" className="font-label-caps text-label-caps text-on-surface-variant block uppercase">
-                Email address
+            <div>
+              <label className="block font-label-md text-label-md text-on-surface mb-2">
+                Email Address
+              </label>
+              <input
+                type="email"
+                name="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="admin@humours.com"
+                className="w-full bg-[#1a1a1a] border border-white/10 text-on-surface p-4 font-body-md text-body-md focus:border-primary-container focus:outline-none transition-colors duration-200"
+              />
+            </div>
+
+            <div>
+              <label className="block font-label-md text-label-md text-on-surface mb-2">
+                Password
               </label>
               <div className="relative">
-                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-50 text-xl">
-                  mail
-                </span>
                 <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="name@example.com"
-                  className="w-full bg-[#080808] border border-white/10 py-4 pl-12 pr-4 text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant/30 focus:outline-none focus:ring-1 focus:ring-primary-container focus:border-primary-container transition-all rounded-none"
-                />
-              </div>
-            </div>
-
-            {/* Password */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-end">
-                <label htmlFor="password" className="font-label-caps text-label-caps text-on-surface-variant block uppercase">
-                  Password
-                </label>
-                <span className="text-xs text-primary font-body-md opacity-70 cursor-not-allowed select-none">
-                  Forgot password?
-                </span>
-              </div>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-50 text-xl">
-                  lock
-                </span>
-                <input
-                  id="password"
-                  name="password"
                   type={showPassword ? 'text' : 'password'}
-                  autoComplete="current-password"
+                  name="password"
                   required
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full bg-[#080808] border border-white/10 py-4 pl-12 pr-12 text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant/30 focus:outline-none focus:ring-1 focus:ring-primary-container focus:border-primary-container transition-all rounded-none"
+                  className="w-full bg-[#1a1a1a] border border-white/10 text-on-surface p-4 font-body-md text-body-md pr-12 focus:border-primary-container focus:outline-none transition-colors duration-200"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary-container transition-colors"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors duration-200"
                 >
-                  <span className="material-symbols-outlined text-xl">
+                  <span className="material-symbols-outlined text-lg">
                     {showPassword ? 'visibility_off' : 'visibility'}
                   </span>
                 </button>
               </div>
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-primary-container text-[#0A0A0A] font-headline-sm text-headline-sm font-bold py-4 active:scale-[0.98] hover:brightness-110 transition-all duration-150 mt-4 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-primary-container text-[#0A0A0A] font-headline-sm text-headline-sm font-bold py-4 active:scale-[0.98] hover:brightness-110 transition-all duration-150 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
             >
               {isLoading ? (
                 <>
@@ -239,22 +159,6 @@ export default function Login() {
                   <span className="material-symbols-outlined text-lg">arrow_forward</span>
                 </>
               )}
-            </button>
-
-            <div className="flex items-center justify-between mt-4 mb-4">
-              <hr className="w-full border-white/10" />
-              <span className="px-4 text-xs text-on-surface-variant font-label-caps uppercase">Or</span>
-              <hr className="w-full border-white/10" />
-            </div>
-
-            <button
-              type="button"
-              onClick={handlePasskeyLogin}
-              disabled={isLoading}
-              className="w-full bg-[#1a1a1a] border border-white/10 text-on-surface font-headline-sm text-headline-sm font-bold py-4 active:scale-[0.98] hover:bg-white/5 transition-all duration-150 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span className="material-symbols-outlined text-lg">fingerprint</span>
-              Sign in with Passkey
             </button>
 
             {/* Admin only notice */}

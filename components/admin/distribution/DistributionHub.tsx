@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import DistributionList from './DistributionList';
 import DistributionDetail from './DistributionDetail';
 
@@ -7,7 +8,12 @@ export default function DistributionHub() {
   const [loading, setLoading] = useState(true);
   const [selectedWorkspace, setSelectedWorkspace] = useState<any | null>(null);
   const [showModal, setShowModal] = useState(false);
-  
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [eventForm, setEventForm] = useState({
     name: '',
     showDate: '',
@@ -95,8 +101,8 @@ export default function DistributionHub() {
       )}
 
       {/* New Event Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+      {showModal && mounted && createPortal(
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] p-4 backdrop-blur-sm">
           <div className="bg-[#1c1b1b] p-6 rounded-xl border border-white/10 w-full max-w-md">
             <h3 className="text-xl font-bold mb-6 text-primary-container">Create New Event</h3>
             <form onSubmit={handleCreateEvent} className="space-y-4">
@@ -153,7 +159,8 @@ export default function DistributionHub() {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
