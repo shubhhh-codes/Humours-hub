@@ -26,8 +26,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const client = await clientPromise;
     const db = client.db();
 
-    // Retrieve stored challenge
-    const challengeDoc = await db.collection('passkey_challenges').findOne({ type: 'register' });
+    // Retrieve stored challenge (newest first)
+    const challengeDoc = await db
+      .collection('passkey_challenges')
+      .findOne({ type: 'register' }, { sort: { createdAt: -1 } });
     if (!challengeDoc) {
       return res.status(400).json({ error: 'No active registration challenge found. Please try again.' });
     }
