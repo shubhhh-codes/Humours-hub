@@ -700,7 +700,11 @@ export default function AdminPanel() {
                       try {
                         const { startRegistration } = await import('@simplewebauthn/browser');
                         const optRes = await fetch('/api/auth/passkey/register-options', { method: 'POST' });
-                        if (!optRes.ok) { toast.error('Could not start passkey registration'); return; }
+                        if (!optRes.ok) {
+                          const errData = await optRes.json().catch(() => ({}));
+                          toast.error(errData.error || 'Could not start passkey registration');
+                          return;
+                        }
                         const optJSON = await optRes.json();
                         const regResp = await startRegistration({ optionsJSON: optJSON });
                         const verRes = await fetch('/api/auth/passkey/register', {
@@ -708,13 +712,22 @@ export default function AdminPanel() {
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify(regResp),
                         });
-                        if (!verRes.ok) { const e = await verRes.json(); toast.error(e.error || 'Registration failed'); return; }
+                        if (!verRes.ok) {
+                          const e = await verRes.json().catch(() => ({}));
+                          toast.error(e.error || 'Registration verification failed');
+                          return;
+                        }
                         const { deviceName } = await verRes.json();
                         localStorage.setItem('hh-admin-passkey-registered', 'true');
                         toast.success(`Passkey saved for ${deviceName}`);
                         fetchPasskeys();
                       } catch (err: any) {
-                        if (err.name !== 'NotAllowedError') toast.error(err.message || 'Failed to register passkey');
+                        console.error('[admin-register-passkey]', err);
+                        if (err.name === 'NotAllowedError') {
+                          toast.info('Passkey creation prompt was cancelled or not allowed.');
+                        } else {
+                          toast.error(err.message || 'Failed to register passkey');
+                        }
                       } finally {
                         setIsRegisteringPasskey(false);
                       }
