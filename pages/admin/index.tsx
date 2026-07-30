@@ -104,6 +104,16 @@ export default function AdminPanel() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
+  // Passkeys
+  const [passkeys, setPasskeys] = useState<Array<{
+    id: string;
+    deviceName: string;
+    credentialDeviceType: string;
+    credentialBackedUp: boolean;
+    createdAt: string;
+    lastUsedAt: string;
+  }>>([]);
+  const [isRegisteringPasskey, setIsRegisteringPasskey] = useState(false);
   const [paymentStats, setPaymentStats] = useState<PaymentStats>({
     totalAmount: 0,
     totalPayments: 0,
@@ -202,6 +212,17 @@ export default function AdminPanel() {
     }
   }, []);
 
+  const fetchPasskeys = useCallback(async () => {
+    try {
+      const res = await fetch('/api/auth/passkey/list');
+      if (!res.ok) return;
+      const data = await res.json();
+      setPasskeys(data.passkeys);
+    } catch (err) {
+      console.error('Fetch passkeys error:', err);
+    }
+  }, []);
+
   const fetchVenueCapacity = useCallback(async () => {
     try {
       const res = await fetch('/api/admin/venue-capacity');
@@ -218,7 +239,7 @@ export default function AdminPanel() {
   const fetchData = useCallback(async () => {
     try {
       if (activeTab === 'dashboard') {
-        await Promise.all([fetchBookings(), fetchComedians(), fetchPayments(), fetchMessages(), fetchFeedbacks(), fetchVenueCapacity()]);
+        await Promise.all([fetchBookings(), fetchComedians(), fetchPayments(), fetchMessages(), fetchFeedbacks(), fetchVenueCapacity(), fetchPasskeys()]);
       } else if (activeTab === 'bookings') {
         await fetchBookings();
       } else if (activeTab === 'comedians') {
@@ -236,7 +257,7 @@ export default function AdminPanel() {
     } finally {
       setLoading(false);
     }
-  }, [activeTab, fetchBookings, fetchComedians, fetchPayments, fetchMessages, fetchFeedbacks, fetchVenueCapacity]);
+  }, [activeTab, fetchBookings, fetchComedians, fetchPayments, fetchMessages, fetchFeedbacks, fetchVenueCapacity, fetchPasskeys]);
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -659,6 +680,94 @@ export default function AdminPanel() {
                    <span className="material-symbols-outlined">send</span>
                    Send Daily Digest
                  </button>
+              </div>
+
+              {/* Security — Passkey Management */}
+              <div className="bg-[#131313] p-6 rounded brutalist-border mt-4">
+                <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-primary-container/10 border border-primary-container/20 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-primary-container text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>fingerprint</span>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-label-caps tracking-widest uppercase text-on-surface/70">Passkey Security</h3>
+                      <p className="text-xs text-on-surface/40 mt-0.5">Devices authorised for biometric login</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={async () => {
+                      setIsRegisteringPasskey(true);
+                      try {
+                        const { startRegistration } = await import('@simplewebauthn/browser');
+                        const optRes = await fetch('/api/auth/passkey/register-options', { method: 'POST' });
+                        if (!optRes.ok) { toast.error('Could not start passkey registration'); return; }
+                        const optJSON = await optRes.json();
+                        const regResp = await startRegistration({ optionsJSON: optJSON });
+                        const verRes = await fetch('/api/auth/passkey/register', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify(regResp),
+                        });
+                        if (!verRes.ok) { const e = await verRes.json(); toast.error(e.error || 'Registration failed'); return; }
+                        const { deviceName } = await verRes.json();
+                        localStorage.setItem('hh-admin-passkey-registered', 'true');
+                        toast.success(`Passkey saved for ${deviceName}`);
+                        fetchPasskeys();
+                      } catch (err: any) {
+                        if (err.name !== 'NotAllowedError') toast.error(err.message || 'Failed to register passkey');
+                      } finally {
+                        setIsRegisteringPasskey(false);
+                      }
+                    }}
+                    disabled={isRegisteringPasskey}
+                    className="flex items-center gap-2 px-4 py-2 bg-primary-container/10 border border-primary-container/30 text-primary-container text-xs font-bold rounded-lg hover:bg-primary-container/20 transition-colors disabled:opacity-50"
+                  >
+                    <span className="material-symbols-outlined text-base">add</span>
+                    {isRegisteringPasskey ? 'Registering…' : 'Register New Device'}
+                  </button>
+                </div>
+
+                {passkeys.length === 0 ? (
+                  <div className="flex flex-col items-center gap-2 py-6 text-on-surface/30">
+                    <span className="material-symbols-outlined text-3xl">key_off</span>
+                    <p className="text-xs">No passkeys registered. Login with password and save a passkey for faster access.</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    {passkeys.map((pk) => (
+                      <div key={pk.id} className="flex items-center justify-between gap-4 p-3 bg-black/30 rounded-lg border border-white/5">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <span className="material-symbols-outlined text-on-surface/40 text-xl shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>devices</span>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-on-surface truncate">{pk.deviceName}</p>
+                            <p className="text-[10px] text-on-surface/40 mt-0.5">
+                              Added {new Date(pk.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                              {pk.lastUsedAt && <> &middot; Last used {new Date(pk.lastUsedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</>}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={async () => {
+                            if (!confirm(`Remove passkey for "${pk.deviceName}"?`)) return;
+                            const res = await fetch(`/api/auth/passkey/delete?id=${pk.id}`, { method: 'DELETE' });
+                            if (res.ok) {
+                              toast.success('Passkey removed');
+                              // If no more passkeys remain, clear the localStorage flag
+                              if (passkeys.length <= 1) localStorage.removeItem('hh-admin-passkey-registered');
+                              fetchPasskeys();
+                            } else {
+                              toast.error('Failed to remove passkey');
+                            }
+                          }}
+                          className="shrink-0 p-2 rounded-lg text-error hover:bg-error/10 transition-colors"
+                          title="Remove passkey"
+                        >
+                          <span className="material-symbols-outlined text-base">delete</span>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </section>
           )}
