@@ -153,3 +153,4 @@ results.json
 !docs/**/*.md
 !docs/*.md
 .env*
+!.env.example

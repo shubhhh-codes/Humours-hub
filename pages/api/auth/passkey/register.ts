@@ -42,12 +42,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const rpID = process.env.PASSKEY_RP_ID || 'localhost';
-    const origin = process.env.PASSKEY_ORIGIN || 'http://localhost:3000';
+    const envOrigin = (process.env.PASSKEY_ORIGIN || 'http://localhost:3000').replace(/\/$/, '');
+    const reqHeaderOrigin = req.headers.origin ? req.headers.origin.replace(/\/$/, '') : '';
+
+    const expectedOrigin = Array.from(new Set([
+      envOrigin,
+      reqHeaderOrigin,
+      envOrigin.replace('://www.', '://'),
+      envOrigin.replace('://', '://www.'),
+    ].filter(Boolean)));
 
     const verification = await verifyRegistrationResponse({
       response: req.body,
       expectedChallenge: challengeDoc.challenge,
-      expectedOrigin: origin,
+      expectedOrigin,
       expectedRPID: rpID,
       requireUserVerification: false,
     });
