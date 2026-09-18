@@ -17,7 +17,10 @@
     "format": "prettier --write .",
     "type-check": "tsc --noEmit",
     "init-db": "ts-node scripts/init-db.ts",
-    "db:seed": "ts-node scripts/seed-database.ts"
+    "db:seed": "ts-node scripts/seed-database.ts",
+    "seed:tickets": "ts-node scripts/seed-tickets.ts",
+    "seed:all": "ts-node scripts/seed-all.ts",
+    "seed:images": "ts-node scripts/seed-performer-images.ts"
   },
   "dependencies": {
     "@simplewebauthn/browser": "^13.3.0",
